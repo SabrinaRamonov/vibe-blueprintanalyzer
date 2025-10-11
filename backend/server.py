@@ -85,13 +85,13 @@ async def analyze_blueprint_with_ai(image_bytes: bytes, filename: str) -> dict:
             tmp_file.write(image_bytes)
             tmp_path = tmp_file.name
         
-        # Initialize AI chat with vision
+        # Initialize AI chat with vision (using Gemini as it supports file attachments)
         api_key = os.environ.get('EMERGENT_LLM_KEY', '')
         chat = LlmChat(
             api_key=api_key,
             session_id=f"blueprint-{uuid.uuid4()}",
             system_message="You are an expert construction blueprint analyzer. Analyze blueprints to detect dimensions, scales, and measurements with precision."
-        ).with_model("openai", "gpt-4o")
+        ).with_model("gemini", "gemini-2.0-flash")
         
         # Create message with image
         image_content = FileContentWithMimeType(

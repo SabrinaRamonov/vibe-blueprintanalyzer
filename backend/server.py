@@ -80,23 +80,20 @@ async def get_status_checks():
 async def analyze_blueprint_with_ai(image_bytes: bytes, filename: str) -> dict:
     """Use AI vision to analyze blueprint and extract dimensions"""
     try:
-        # Save image temporarily
-        with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as tmp_file:
-            tmp_file.write(image_bytes)
-            tmp_path = tmp_file.name
+        # Encode image as base64
+        image_b64 = base64.b64encode(image_bytes).decode('utf-8')
         
-        # Initialize AI chat with vision (using Gemini as it supports file attachments)
+        # Initialize AI chat with vision (using Claude with base64 encoding)
         api_key = os.environ.get('EMERGENT_LLM_KEY', '')
         chat = LlmChat(
             api_key=api_key,
             session_id=f"blueprint-{uuid.uuid4()}",
             system_message="You are an expert construction blueprint analyzer. Analyze blueprints to detect dimensions, scales, and measurements with precision."
-        ).with_model("gemini", "gemini-2.0-flash")
+        ).with_model("anthropic", "claude-sonnet-4-20250514")
         
-        # Create message with image
-        image_content = FileContentWithMimeType(
-            file_path=tmp_path,
-            mime_type="image/png"
+        # Create message with base64 encoded image
+        image_content = ImageContent(
+            image_base64=image_b64
         )
         
         prompt = """Analyze this construction blueprint image and provide detailed measurement information:

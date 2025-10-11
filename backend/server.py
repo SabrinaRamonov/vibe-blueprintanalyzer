@@ -15,7 +15,7 @@ from PIL import Image, ImageDraw, ImageFont
 import cv2
 import numpy as np
 from pdf2image import convert_from_bytes
-from emergentintegrations.llm.chat import LlmChat, UserMessage, FileContentWithMimeType
+from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
 import tempfile
 import json
 

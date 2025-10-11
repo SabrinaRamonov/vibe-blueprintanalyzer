@@ -135,6 +135,18 @@ Provide your response in JSON format:
         try:
             # Try to extract JSON from response
             response_text = response.strip()
+            
+            # Check if Claude returned an error
+            if "could not process" in response_text.lower() or "unable to analyze" in response_text.lower():
+                logger.warning(f"Claude image processing issue: {response_text[:200]}")
+                return {
+                    "scale": "Unable to detect",
+                    "scale_confidence": "low",
+                    "dimensions": [],
+                    "notes": "The image quality or format may not be optimal for analysis. Please try a higher resolution blueprint or a clearer scan.",
+                    "error": "image_processing_failed"
+                }
+            
             if '```json' in response_text:
                 response_text = response_text.split('```json')[1].split('```')[0].strip()
             elif '```' in response_text:
@@ -142,13 +154,14 @@ Provide your response in JSON format:
             
             analysis_data = json.loads(response_text)
             return analysis_data
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as e:
+            logger.warning(f"JSON parsing error: {e}")
             # If JSON parsing fails, return structured data
             return {
                 "scale": "Unable to detect",
                 "scale_confidence": "low",
                 "dimensions": [],
-                "notes": response,
+                "notes": response[:500] if len(response) < 500 else response[:500] + "...",
                 "raw_response": response
             }
     

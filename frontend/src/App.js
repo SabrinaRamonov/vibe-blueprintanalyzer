@@ -77,7 +77,16 @@ function App() {
       });
 
       setResult(response.data);
-      toast.success('Blueprint analyzed successfully!');
+      
+      // Check if analysis had issues
+      const analysis = response.data.analysis;
+      if (analysis?.error === 'image_processing_failed') {
+        toast.warning('Analysis completed with limitations. Try a clearer image for better results.');
+      } else if (analysis?.dimensions?.length === 0) {
+        toast.warning('No dimensions detected. The blueprint may need better contrast or resolution.');
+      } else {
+        toast.success('Blueprint analyzed successfully!');
+      }
     } catch (error) {
       console.error('Error analyzing blueprint:', error);
       toast.error(error.response?.data?.detail || 'Failed to analyze blueprint');

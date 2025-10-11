@@ -131,9 +131,6 @@ Provide your response in JSON format:
         # Get AI response
         response = await chat.send_message(user_message)
         
-        # Clean up temp file
-        os.unlink(tmp_path)
-        
         # Parse JSON response
         try:
             # Try to extract JSON from response
